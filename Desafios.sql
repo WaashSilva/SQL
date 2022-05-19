@@ -69,6 +69,27 @@ where sexo = 'm' or 'M' and nacionalidade != 'Brasil' and nascimento between '19
 select nome, sexo,altura from gafanhotos
 where altura > '1.90' and sexo = 'f' or 'F';
 
+-- 1- Qual o nome do produto (e quantidade) mais vendido (em unidades) em 2021 da BI_CATEGORY_ONE = Adulte
+
+-- SELECIONA O ITEM COM MAIOR QUANTIDADE VENDIDA EM 2021 NA CATEGORIA ADULTO TEMPO DE CURSO MAISOU MENOS 00:00:04
+SELECT TOP 1
+	COUNT(FSOI.SK_PRODUCT) AS QTD_PROD
+	,db.DSC_PRODUCT_NAME AS PROD_NAME
+	,DB.DSC_BI_PRODUCT_CATEGORY_ONE AS PROD_CAT
+	,FSOI.SK_DATE
+FROM 
+	FCT_SALES_ORDER_ITEM AS FSOI
+	INNER JOIN DIM_PRODUCT AS DB
+	ON FSOI.SK_PRODUCT = DB.SK_PRODUCT
+WHERE DB.DSC_BI_PRODUCT_CATEGORY_ONE IN ('Adulte','adulte') AND FSOI.SK_DATE BETWEEN '20210101' AND '20211231'
+GROUP BY 
+	 FSOI.SK_PRODUCT
+	,db.DSC_PRODUCT_NAME
+	,DB.DSC_BI_PRODUCT_CATEGORY_ONE
+	,FSOI.SK_DATE
+ORDER BY QTD_PROD DESC
+	
+
 -- 3. Qual o nome do produto vendido em 2022 com o maior valor (utilizem o campo MTR_GMV_INCL_TAX da tabela V_M06_F01_FCT_SALES_ORDER_ITEM_SALES em LCY 
 --(local currency, o valor que já lá está), mas também em EUR e USD (via tabela V_AUX_CHANGED_RATE)
 -- Oque eu usei, 2 inner join, format para definir a divisão dos valores dastabelas e informar o padrão que deveriam apresentar
@@ -120,20 +141,3 @@ DP.DSC_PRODUCT_NAME,
 DP.DSC_PRODUCT_BRAND_NAME
 order by PR_EUR DESC,
 PR_DOLLAR DESC;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
