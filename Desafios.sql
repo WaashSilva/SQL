@@ -238,7 +238,30 @@ GROUP BY
 	--,DD.COD_TRIMESTER
 	,C.DSC_COUNTRY_SMALL
 
-
-	
-
-	
+-- Qual é a distribuição dos pedidos por hora do dia. Egipto, last week (segunda a domingo)
+-- quero que apareca mesmo que o count dê zero
+-- quero saber qual é a % de cada uma das horas sobre o total
+WITH TEMP AS(
+SELECT
+	dt.HOUR_24
+	,SUM(CASE WHEN SK_DT_ORDER_CREATION BETWEEN 20220516 AND 20220522 THEN 1 ELSE 0 END) as QTD_ORD_HR
+FROM
+	DW.FCT_ORDERS fo
+	RIGHT JOIN DW.D_TIME dt ON dt.SK_TIME = fo.SK_TIME_ORDER_CREATION
+	INNER JOIN _AUX.COUNTRIES c ON fo.COD_COUNTRY = c.COD_COUNTRY
+WHERE
+	c.DSC_COUNTRY_SMALL = 'EG'
+GROUP BY
+	dt.HOUR_24
+),
+TEMP1 AS(
+SELECT
+SUM (TEMP.QTD_ORD_HR) AS SOMA
+FROM TEMP
+)
+SELECT
+	 TEMP.HOUR_24
+	,TEMP.QTD_ORD_HR
+	,ROUND (((TEMP.QTD_ORD_HR)*1.0 / TEMP1.SOMA)*100,2) AS PERC_TT
+FROM TEMP,TEMP1
+ORDER BY HOUR_24
