@@ -1,3 +1,7 @@
+DECLARE @CurrentYear INT = YEAR(GETDATE());
+DECLARE @StartDate DATE = DATEFROMPARTS(@CurrentYear - 10, 1, 1);
+DECLARE @EndDate DATE = DATEFROMPARTS(@CurrentYear + 5, 12, 31);
+
 SELECT
     sk_calendar,
     FullDate,
@@ -15,6 +19,8 @@ SELECT
     CONVERT(date, CLD.FullDate, 23) AS Date,
     CONCAT(CAST(CLD.Year AS VARCHAR), RIGHT('00' + CAST(CLD.Month AS VARCHAR), 2)) AS MonthYearNum,
     (YEAR(CLD.FullDate) - YEAR(GETDATE())) * 12 + MONTH(CLD.FullDate) - MONTH(GETDATE()) AS CurMonthOffset,
+    DATEDIFF(YEAR, GETDATE(), CLD.FullDate) AS CurYearOffset,
+    DATEDIFF(DAY, GETDATE(), CLD.FullDate) AS CurDayOffset,
     CASE WHEN (YEAR(CLD.FullDate) - YEAR(GETDATE())) * 12 + MONTH(CLD.FullDate) - MONTH(GETDATE()) <= -1 THEN 'Past' ELSE 'Future' END AS FutureDate,
     MonthName,
     CASE
@@ -75,3 +81,5 @@ SELECT
     END AS MonthLong_PL
 FROM
     DW.dim_sf_Calendar AS CLD
+WHERE
+    CLD.FullDate BETWEEN @StartDate AND @EndDate;
